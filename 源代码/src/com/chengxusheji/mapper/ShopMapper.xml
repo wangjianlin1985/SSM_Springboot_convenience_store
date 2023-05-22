@@ -1,0 +1,48 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ShopMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加门店记录 -->
+	<insert id="addShop" parameterType="shop">
+		insert into t_shop(shopName,connectPerson,connectPhone,address) values 
+		(#{shopName},#{connectPerson},#{connectPhone},#{address})
+	</insert>
+
+	<!-- 按照查询条件分页查询门店记录 -->
+	<select id="queryShop" resultMap="shopMap" >
+		select t_shop.* from t_shop ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="shopMap" type="shop">
+        <id property="shopId" column="shopId" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有门店记录 -->
+	<select id="queryShopList" resultMap="shopMap" >
+		select t_shop.* from t_shop ${where}
+	</select>
+
+    <!-- 按照查询条件的门店记录数 -->
+	<select id="queryShopCount" resultType="int">
+		select count(*) from t_shop ${where}
+	</select>
+
+	<!-- 根据主键查询某个门店记录 -->
+	<select id="getShop" parameterType="int" resultMap="shopMap">
+		select * from t_shop where t_shop.shopId = #{shopId}
+	</select>
+
+	<!-- 更新门店记录 -->
+	<update id="updateShop" parameterType="shop">
+		update t_shop set shopName=#{shopName},connectPerson=#{connectPerson},connectPhone=#{connectPhone},address=#{address} where shopId = #{shopId}
+	</update>
+
+	<!-- 删除门店记录 -->
+	<delete id="deleteShop" parameterType="int">
+		delete from t_shop where shopId=#{shopId}
+	</delete>
+
+</mapper>

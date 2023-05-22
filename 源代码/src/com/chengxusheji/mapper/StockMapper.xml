@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.StockMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加商品库存记录 -->
+	<insert id="addStock" parameterType="stock">
+		insert into t_stock(productObj,shopObj,leftCount,memo) values 
+		(#{productObj.productId},#{shopObj.shopId},#{leftCount},#{memo})
+	</insert>
+
+	<!-- 按照查询条件分页查询商品库存记录 -->
+	<select id="queryStock" resultMap="stockMap" >
+		select t_stock.* from t_stock,t_product,t_shop ${where} and t_stock.productObj = t_product.productId and t_stock.shopObj = t_shop.shopId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="stockMap" type="stock">
+        <id property="stockId" column="stockId" />
+        <association property="productObj" column="productObj" select="com.chengxusheji.mapper.ProductMapper.getProduct" />
+        <association property="shopObj" column="shopObj" select="com.chengxusheji.mapper.ShopMapper.getShop" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有商品库存记录 -->
+	<select id="queryStockList" resultMap="stockMap" >
+		select t_stock.* from t_stock,t_product,t_shop ${where} and t_stock.productObj = t_product.productId and t_stock.shopObj = t_shop.shopId
+	</select>
+
+    <!-- 按照查询条件的商品库存记录数 -->
+	<select id="queryStockCount" resultType="int">
+		select count(*) from t_stock,t_product,t_shop ${where} and t_stock.productObj = t_product.productId and t_stock.shopObj = t_shop.shopId
+	</select>
+
+	<!-- 根据主键查询某个商品库存记录 -->
+	<select id="getStock" parameterType="int" resultMap="stockMap">
+		select * from t_stock where t_stock.stockId = #{stockId}
+	</select>
+
+	<!-- 更新商品库存记录 -->
+	<update id="updateStock" parameterType="stock">
+		update t_stock set productObj=#{productObj.productId},shopObj=#{shopObj.shopId},leftCount=#{leftCount},memo=#{memo} where stockId = #{stockId}
+	</update>
+
+	<!-- 删除商品库存记录 -->
+	<delete id="deleteStock" parameterType="int">
+		delete from t_stock where stockId=#{stockId}
+	</delete>
+
+</mapper>

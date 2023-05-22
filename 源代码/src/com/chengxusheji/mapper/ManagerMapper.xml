@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ManagerMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加店铺管理员记录 -->
+	<insert id="addManager" parameterType="manager">
+		insert into t_manager(managerUserName,password,shopObj,name,sex,birthday,userPhoto,telephone,memo) values 
+		(#{managerUserName},#{password},#{shopObj.shopId},#{name},#{sex},#{birthday},#{userPhoto},#{telephone},#{memo})
+	</insert>
+
+	<!-- 按照查询条件分页查询店铺管理员记录 -->
+	<select id="queryManager" resultMap="managerMap" >
+		select t_manager.* from t_manager,t_shop ${where} and t_manager.shopObj = t_shop.shopId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="managerMap" type="manager">
+        <id property="managerUserName" column="managerUserName" />
+        <association property="shopObj" column="shopObj" select="com.chengxusheji.mapper.ShopMapper.getShop" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有店铺管理员记录 -->
+	<select id="queryManagerList" resultMap="managerMap" >
+		select t_manager.* from t_manager,t_shop ${where} and t_manager.shopObj = t_shop.shopId
+	</select>
+
+    <!-- 按照查询条件的店铺管理员记录数 -->
+	<select id="queryManagerCount" resultType="int">
+		select count(*) from t_manager,t_shop ${where} and t_manager.shopObj = t_shop.shopId
+	</select>
+
+	<!-- 根据主键查询某个店铺管理员记录 -->
+	<select id="getManager" parameterType="string" resultMap="managerMap">
+		select * from t_manager where t_manager.managerUserName = #{managerUserName}
+	</select>
+
+	<!-- 更新店铺管理员记录 -->
+	<update id="updateManager" parameterType="manager">
+		update t_manager set password=#{password},shopObj=#{shopObj.shopId},name=#{name},sex=#{sex},birthday=#{birthday},userPhoto=#{userPhoto},telephone=#{telephone},memo=#{memo} where managerUserName = #{managerUserName}
+	</update>
+
+	<!-- 删除店铺管理员记录 -->
+	<delete id="deleteManager" parameterType="string">
+		delete from t_manager where managerUserName=#{managerUserName}
+	</delete>
+
+</mapper>
